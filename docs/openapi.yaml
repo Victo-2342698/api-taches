@@ -1,0 +1,274 @@
+openapi: 3.0.0
+info:
+  title: API Liste de Tâches
+  version: 1.0.0
+  description: Documentation de l’API REST pour la gestion des tâches
+
+servers:
+  - url: http://localhost:3000
+
+paths:
+  /utilisateurs:
+    post:
+      summary: Créer un nouvel utilisateur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nom:
+                  type: string
+                prenom:
+                  type: string
+                courriel:
+                  type: string
+                password:
+                  type: string
+      responses:
+        201:
+          description: Utilisateur créé avec succès
+
+  /cle-api:
+    post:
+      summary: Récupérer ou régénérer une clé API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                courriel:
+                  type: string
+                password:
+                  type: string
+                regenerer:
+                  type: boolean
+      responses:
+        200:
+          description: Clé retournée
+
+  /taches:
+    get:
+      summary: Obtenir la liste des tâches de l'utilisateur
+      parameters:
+        - in: query
+          name: toutes
+          schema:
+            type: boolean
+          required: false
+          description: Afficher toutes les tâches, y compris celles terminées
+      security:
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Liste des tâches
+
+    post:
+      summary: Ajouter une nouvelle tâche
+      security:
+        - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - titre
+                - date_debut
+                - date_echeance
+              properties:
+                titre:
+                  type: string
+                description:
+                  type: string
+                date_debut:
+                  type: string
+                  format: date
+                date_echeance:
+                  type: string
+                  format: date
+      responses:
+        '201':
+          description: Tâche ajoutée avec succès
+
+  /taches/{id}:
+    get:
+      summary: Voir les détails d’une tâche
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Tâche avec sous-tâches
+
+    put:
+      summary: Modifier une tâche
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                titre:
+                  type: string
+                description:
+                  type: string
+                date_debut:
+                  type: string
+                  format: date
+                date_echeance:
+                  type: string
+                  format: date
+      responses:
+        '200':
+          description: Tâche modifiée
+
+    delete:
+      summary: Supprimer une tâche
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Tâche supprimée
+
+  /taches/{id}/statut:
+    patch:
+      summary: Modifier le statut d’une tâche
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statut:
+                  type: string
+                  enum: [en cours, terminée]
+      responses:
+        '200':
+          description: Statut modifié
+
+  /sous-taches:
+    post:
+      summary: Ajouter une sous-tâche à une tâche existante
+      security:
+        - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tache_id
+                - titre
+              properties:
+                tache_id:
+                  type: integer
+                titre:
+                  type: string
+      responses:
+        '201':
+          description: Sous-tâche ajoutée
+
+  /sous-taches/{id}:
+    put:
+      summary: Modifier une sous-tâche
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                titre:
+                  type: string
+      responses:
+        '200':
+          description: Sous-tâche modifiée
+
+    delete:
+      summary: Supprimer une sous-tâche
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Sous-tâche supprimée
+
+  /sous-taches/{id}/statut:
+    patch:
+      summary: Modifier le statut d'une sous-tâche
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      security:
+        - apiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                statut:
+                  type: string
+                  enum: [en cours, terminée]
+      responses:
+        '200':
+          description: Statut mis à jour
+
+components:
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestion des utilisateurs</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; }
+    input, button { margin: 0.5em 0; padding: 0.5em; width: 300px; }
+    .section { margin-bottom: 2em; }
+    .result { margin-top: 1em; color: green; font-weight: bold; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+
+  <h1>Interface de gestion des utilisateurs</h1>
+
+  <div class="section">
+    <h2>Créer un nouvel utilisateur</h2>
+    <input type="text" id="nom" placeholder="Nom">
+    <input type="text" id="prenom" placeholder="Prénom">
+    <input type="email" id="courriel" placeholder="Courriel">
+    <input type="password" id="password" placeholder="Mot de passe">
+    <button onclick="creerUtilisateur()">Créer</button>
+    <div id="result-creer" class="result"></div>
+  </div>
+
+  <div class="section">
+    <h2>Récupérer ou régénérer une clé API</h2>
+    <input type="email" id="courrielCle" placeholder="Courriel">
+    <input type="password" id="passwordCle" placeholder="Mot de passe">
+    <label>
+      <input type="checkbox" id="regen"> Régénérer la clé
+    </label>
+    <button onclick="recupererCle()">Envoyer</button>
+    <div id="result-cle" class="result"></div>
+  </div>
+
+  <script>
+    async function creerUtilisateur() {
+      const body = {
+        nom: document.getElementById('nom').value,
+        prenom: document.getElementById('prenom').value,
+        courriel: document.getElementById('courriel').value,
+        password: document.getElementById('password').value
+      };
+
+      const res = await fetch('/utilisateurs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      const data = await res.json();
+      document.getElementById('result-creer').textContent =
+        data.cle_api ? `Clé API générée: ${data.cle_api}` : JSON.stringify(data);
+    }
+
+    async function recupererCle() {
+      const body = {
+        courriel: document.getElementById('courrielCle').value,
+        password: document.getElementById('passwordCle').value,
+        regenerer: document.getElementById('regen').checked
+      };
+
+      const res = await fetch('/cle-api', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      const data = await res.json();
+      document.getElementById('result-cle').textContent =
+        data.cle_api ? `Clé API : ${data.cle_api}` : JSON.stringify(data);
+    }
+  </script>
+
+</body>
+</html>
