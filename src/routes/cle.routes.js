@@ -4,4 +4,4 @@ const cleController = require('../controllers/cle.controller');
 
 router.post('/', cleController.recupererOuGenererCle);
 
-module.exports = router;
+  module.exports = router;

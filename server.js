@@ -8,7 +8,6 @@ const yaml = require('js-yaml');
 
 const app = express();
 app.use(cors());
-
 app.use(express.json());
 app.use(morgan('dev'));
 
@@ -21,10 +20,9 @@ app.use('/utilisateurs', require('./src/routes/utilisateurs.routes'));
 app.use('/cle-api', require('./src/routes/cle.routes'));
 
 const verifierCleAPI = require('./src/middlewares/auth.middleware');
-app.use(verifierCleAPI);
 
-app.use('/taches', require('./src/routes/taches.routes'));
-app.use('/sous-taches', require('./src/routes/sousTaches.routes'));
+app.use('/taches', verifierCleAPI, require('./src/routes/taches.routes'));
+app.use('/sous-taches', verifierCleAPI, require('./src/routes/sousTaches.routes'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Serveur en écoute sur le port ${PORT}`));
