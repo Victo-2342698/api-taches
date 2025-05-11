@@ -8,13 +8,13 @@ const verifierCleAPI = async (req, res, next) => {
   }
 
   try {
-    const [rows] = await pool.query('SELECT * FROM utilisateurs WHERE cle_api = ?', [cle]);
+    const resultat = await pool.query('SELECT * FROM utilisateurs WHERE cle_api = $1', [cle]);
 
-    if (rows.length === 0) {
+    if (resultat.rows.length === 0) {
       return res.status(403).json({ erreur: 'Clé API invalide.' });
     }
 
-    req.utilisateur = rows[0];
+    req.utilisateur = resultat.rows[0];
     next();
 
   } catch (err) {
